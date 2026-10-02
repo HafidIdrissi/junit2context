@@ -11,7 +11,7 @@ git clone https://github.com/HafidIdrissi/junit2context.git
 cd junit2context
 python3 -m venv .venv
 .venv/bin/python -m pip install -e .
-PYTHONPATH=src python3 -m unittest discover -s tests -v
+.venv/bin/python -m unittest discover -s tests -v
 ```
 
 On Windows, use `python` and `.venv\Scripts\python.exe`; after the editable install, run `.venv\Scripts\python.exe -m unittest discover -s tests -v`.
@@ -21,6 +21,48 @@ The runtime uses only the Python standard library. You can also run the CLI dire
 ```bash
 PYTHONPATH=src python3 -m junit2context examples/pytest.xml
 ```
+
+## Focused checks while developing
+
+Run these commands from the repository root, with the editable environment from
+the setup steps above. Use `.venv/bin/python` so installation and testing use the
+same interpreter; on Windows, substitute `.venv\Scripts\python.exe`.
+
+To run one test file, use discovery's filename pattern (`-p`):
+
+```bash
+.venv/bin/python -m unittest discover -s tests -p "test_core.py" -v
+```
+
+To select the report-related CLI tests, combine that pattern with the test-name
+filter (`-k`):
+
+```bash
+.venv/bin/python -m unittest discover -s tests -p "test_cli.py" -k report -v
+```
+
+`-k report` matches names containing `report`, including
+`CliTests.test_passing_report_exit`. Check the reported test names and
+`Ran N tests` count: `Ran 0 tests` means the selection matched nothing, even if
+unittest prints `OK`, and is not evidence that the intended behavior passed.
+
+For a source checkout without an editable install, expose `src` to the same
+Python 3.10+ interpreter. For example, on a POSIX shell:
+
+```bash
+PYTHONPATH=src python3 -m unittest discover -s tests -p "test_core.py" -v
+PYTHONPATH=src python3 -m unittest discover -s tests -p "test_cli.py" -k report -v
+```
+
+Focused checks help during iteration. Before a code pull request, run the full
+suite with the editable environment:
+
+```bash
+.venv/bin/python -m unittest discover -s tests -v
+```
+
+Documentation-only edits do not require unrelated tests; verify any commands you
+add or change.
 
 ## Choose a contribution
 
