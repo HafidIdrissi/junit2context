@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="pytest" tests="4" failures="1" errors="1" skipped="1">
+    <testcase classname="tests.test_checkout" name="test_total_includes_shipping" time="0.02">
+      <failure message="AssertionError: expected 120, got 100">tests/test_checkout.py:18
+    assert order.total == 120
+E   assert 100 == 120
+Environment: API_KEY=demo_secret_do_not_share
+      </failure>
+      <system-out>Captured output is deliberately excluded from the brief.</system-out>
+    </testcase>
+    <testcase classname="tests.test_checkout" name="test_payment_service" time="0.01">
+      <error message="ConnectionError: payment service unavailable">tests/test_checkout.py:32
+ConnectionError: payment service unavailable</error>
+    </testcase>
+    <testcase classname="tests.test_checkout" name="test_empty_cart" time="0.01" />
+    <testcase classname="tests.test_checkout" name="test_live_gateway"><skipped message="needs credentials" /></testcase>
+    <properties><property name="SECRET" value="excluded-property" /></properties>
+  </testsuite>
+</testsuites>

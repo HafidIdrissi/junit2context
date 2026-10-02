@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="vitest tests" tests="2" failures="1">
+  <testsuite name="src/cart.test.ts" tests="2" failures="1">
+    <testcase classname="src/cart.test.ts" name="cart &gt; applies a discount" time="0.003">
+      <failure message="expected 90 to be 80" type="AssertionError">AssertionError: expected 90 to be 80
+  at src/cart.test.ts:14:23</failure>
+    </testcase>
+    <testcase classname="src/cart.test.ts" name="cart &gt; starts empty" time="0.001" />
+  </testsuite>
+</testsuites>

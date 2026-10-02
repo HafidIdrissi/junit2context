@@ -1,0 +1,23 @@
+name: Feature request
+description: Propose a concrete improvement to the debugging workflow.
+title: "[Feature] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: Describe a workflow and where the current tool falls short.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired behavior
+      description: An example command or output is helpful. Use synthetic data.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives or tradeoffs
+      description: Mention workarounds, compatibility considerations, or ideas you have tried.

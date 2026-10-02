@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>junit2context · 30-second demo</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color:#edf2f7;background:#10141b;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0}main{max-width:1160px;margin:auto;padding:40px 24px}
+.eyebrow{color:#90edc3;letter-spacing:.12em;font-size:.8rem;font-weight:700;text-transform:uppercase}
+h1{font-size:clamp(2rem,5vw,3.7rem);letter-spacing:-.045em;line-height:1.06;margin:16px 0;max-width:920px}
+.lead{color:#b7c4d6;font-size:1.1rem;max-width:730px;line-height:1.6}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:26px 0 14px}
+button{font:inherit;background:#202a38;color:inherit;border:1px solid #40516a;border-radius:9px;padding:11px 16px;cursor:pointer}
+button:hover,button[aria-pressed=true]{background:#31453f;border-color:#90edc3}
+button:focus-visible,a:focus-visible{outline:3px solid #90edc3;outline-offset:3px}
+#play{background:#90edc3;color:#102119;border-color:#90edc3;font-weight:700}
+progress{width:100%;height:6px;accent-color:#90edc3}
+.stage{margin-top:22px;border:1px solid #334257;border-radius:16px;background:#151d28;padding:24px;min-height:450px}
+.stage[hidden]{display:none}.stage h2{font-size:1.35rem;margin-top:0}
+.stage p,.note{color:#b7c4d6;line-height:1.55}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;background:#0c1118;padding:20px;border-radius:10px;max-height:410px;overflow:auto;color:#d8e2f0}
+.command{font-size:clamp(.9rem,2vw,1.2rem);padding:26px;border-left:3px solid #90edc3}
+.stats{display:flex;gap:12px;flex-wrap:wrap;margin:22px 0}.stat{background:#202b39;border-radius:10px;padding:16px;min-width:180px}.stat strong{display:block;font-size:1.6rem;color:#90edc3}.stat span{font-size:.8rem;color:#c3cddc}
+a{color:#90edc3}.tag{display:inline-block;border:1px solid #40516a;border-radius:20px;padding:5px 12px;margin:3px;font-size:.85rem}.note{font-size:.85rem}footer{margin-top:24px;color:#97a7bc;font-size:.85rem}code{font-family:ui-monospace,monospace}
+@media(max-width:600px){main{padding:24px 14px}.stage{padding:16px}pre{padding:12px;font-size:12px}.controls button{padding:9px 12px;font-size:.88rem}.stat{min-width:130px}}
+</style>
+</head>
+<body><main>
+<div class="eyebrow">junit2context · open source · MIT</div>
+<h1>Less test-report noise.<br>More useful debugging context.</h1>
+<p class="lead">Turn existing JUnit XML reports into a compact brief for Claude Code, Codex, or your own debugging session. Runs locally. No API key.</p>
+<div class="controls" aria-label="Demo controls">
+<button id="play" type="button">Play 30-second demo</button>
+<button class="step" data-step="0" aria-pressed="true" type="button">1. Reports</button>
+<button class="step" data-step="1" aria-pressed="false" type="button">2. Command</button>
+<button class="step" data-step="2" aria-pressed="false" type="button">3. Brief</button>
+<button class="step" data-step="3" aria-pressed="false" type="button">4. Try it</button>
+</div>
+<progress id="progress" max="30" value="0" aria-label="Demo progress"></progress>
+<section class="stage" data-panel="0"><h2>Start with the reports your tests already produce</h2>
+<p>These bundled, synthetic pytest-style and Vitest-style fixtures contain passing tests, skipped tests, captured output, and three failed tests. The credential below is an invented demo value.</p>
+<pre>&lt;!-- examples/pytest.xml --&gt;
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;testsuites&gt;
+  &lt;testsuite name=&quot;pytest&quot; tests=&quot;4&quot; failures=&quot;1&quot; errors=&quot;1&quot; skipped=&quot;1&quot;&gt;
+    &lt;testcase classname=&quot;tests.test_checkout&quot; name=&quot;test_total_includes_shipping&quot; time=&quot;0.02&quot;&gt;
+      &lt;failure message=&quot;AssertionError: expected 120, got 100&quot;&gt;tests/test_checkout.py:18
+    assert order.total == 120
+E   assert 100 == 120
+Environment: API_KEY=demo_secret_do_not_share
+      &lt;/failure&gt;
+      &lt;system-out&gt;Captured output is deliberately excluded from the brief.&lt;/system-out&gt;
+    &lt;/testcase&gt;
+    &lt;testcase classname=&quot;tests.test_checkout&quot; name=&quot;test_payment_service&quot; time=&quot;0.01&quot;&gt;
+      &lt;error message=&quot;ConnectionError: payment service unavailable&quot;&gt;tests/test_checkout.py:32
+ConnectionError: payment service unavailable&lt;/error&gt;
+    &lt;/testcase&gt;
+    &lt;testcase classname=&quot;tests.test_checkout&quot; name=&quot;test_empty_cart&quot; time=&quot;0.01&quot; /&gt;
+    &lt;testcase classname=&quot;tests.test_checkout&quot; name=&quot;test_live_gateway&quot;&gt;&lt;skipped message=&quot;needs credentials&quot; /&gt;&lt;/testcase&gt;
+    &lt;properties&gt;&lt;property name=&quot;SECRET&quot; value=&quot;excluded-property&quot; /&gt;&lt;/properties&gt;
+  &lt;/testsuite&gt;
+&lt;/testsuites&gt;
+
+
+&lt;!-- examples/vitest.xml --&gt;
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;testsuites name=&quot;vitest tests&quot; tests=&quot;2&quot; failures=&quot;1&quot;&gt;
+  &lt;testsuite name=&quot;src/cart.test.ts&quot; tests=&quot;2&quot; failures=&quot;1&quot;&gt;
+    &lt;testcase classname=&quot;src/cart.test.ts&quot; name=&quot;cart &amp;gt; applies a discount&quot; time=&quot;0.003&quot;&gt;
+      &lt;failure message=&quot;expected 90 to be 80&quot; type=&quot;AssertionError&quot;&gt;AssertionError: expected 90 to be 80
+  at src/cart.test.ts:14:23&lt;/failure&gt;
+    &lt;/testcase&gt;
+    &lt;testcase classname=&quot;src/cart.test.ts&quot; name=&quot;cart &amp;gt; starts empty&quot; time=&quot;0.001&quot; /&gt;
+  &lt;/testsuite&gt;
+&lt;/testsuites&gt;
+</pre></section>
+<section class="stage" data-panel="1" hidden><h2>One local command</h2>
+<pre class="command">junit2context examples/pytest.xml examples/vitest.xml</pre>
+<p>Reads reports, keeps failures and errors, deduplicates repeated failures, and masks common credential patterns. Long traces keep their beginning and end.</p>
+<div><span class="tag">Python 3.10+</span><span class="tag">Zero runtime dependencies</span><span class="tag">Markdown + JSON</span></div>
+<p class="note">The converter does not run tests, contact a model, or modify your code.</p></section>
+<section class="stage" data-panel="2" hidden><h2>A brief you can review and use</h2>
+<pre># Test failure context
+
+3 unique failure(s).
+
+### 1. test\_total\_includes\_shipping
+
+- Suite: pytest
+- Class: tests\.test\_checkout
+- Kind: failure
+- Source: examples/pytest\.xml
+
+Message: AssertionError: expected 120, got 100
+
+```text
+tests/test_checkout.py:18
+    assert order.total == 120
+E   assert 100 == 120
+Environment: API_KEY=[REDACTED]
+```
+
+### 2. test\_payment\_service
+
+- Suite: pytest
+- Class: tests\.test\_checkout
+- Kind: error
+- Source: examples/pytest\.xml
+
+Message: ConnectionError: payment service unavailable
+
+```text
+tests/test_checkout.py:32
+ConnectionError: payment service unavailable
+```
+
+### 3. cart &amp;gt; applies a discount
+
+- Suite: src/cart\.test\.ts
+- Class: src/cart\.test\.ts
+- Kind: failure
+- Source: examples/vitest\.xml
+
+Message: expected 90 to be 80
+
+```text
+AssertionError: expected 90 to be 80
+  at src/cart.test.ts:14:23
+```
+</pre>
+<p class="note">This is actual CLI output, generated from the two sample reports. Redaction is heuristic; always review output before sharing it.</p></section>
+<section class="stage" data-panel="3" hidden><h2>Try your own report. Tell us what is missing.</h2>
+<div class="stats"><div class="stat"><strong>1,622</strong><span>sample XML characters</span></div><div class="stat"><strong>864</strong><span>brief characters</span></div><div class="stat"><strong>46.7%</strong><span>smaller on these fixtures</span></div></div>
+<p class="note">Counts are measured from the bundled reports and generated output, excluding the file-label comments displayed above. This is a sample demonstration, not a benchmark or token estimate.</p>
+<pre>python3 -m venv .venv
+.venv/bin/python -m pip install -e .
+.venv/bin/junit2context your-report.xml --output failures.md</pre>
+<p>From a project checkout, try the commands above. On Windows use <code>.venv\Scripts\</code> executables. Useful contributions include sanitized real-runner fixtures, readable failure examples, and documentation.</p>
+<p><a href="../README.md">Read the project guide</a> · <a href="../CONTRIBUTING.md">How to contribute</a></p></section>
+<noscript><p>The first report is visible above. For the generated brief, open <a href="../examples/brief.md">examples/brief.md</a>.</p></noscript>
+<footer>Offline demo · no external resources or analytics · all displayed outcomes come from the bundled sample reports.</footer>
+</main>
+<script>
+const panels=[...document.querySelectorAll('[data-panel]')];
+const buttons=[...document.querySelectorAll('.step')];
+const play=document.querySelector('#play');const progress=document.querySelector('#progress');
+let timer=null;let started=0;let elapsed=0;
+function select(index){panels.forEach((p,i)=>p.hidden=i!==index);buttons.forEach((b,i)=>b.setAttribute('aria-pressed',String(i===index)));}
+function stop(){clearInterval(timer);timer=null;play.textContent='Play 30-second demo';}
+buttons.forEach(button=>button.addEventListener('click',()=>{stop();select(Number(button.dataset.step));progress.value=[0,8,13,25][Number(button.dataset.step)];}));
+play.addEventListener('click',()=>{if(timer!==null){stop();return;}elapsed=0;started=performance.now();select(0);progress.value=0;play.textContent='Stop demo';timer=setInterval(()=>{elapsed=(performance.now()-started)/1000;progress.value=Math.min(30,elapsed);select(elapsed<8?0:elapsed<13?1:elapsed<25?2:3);if(elapsed>=30)stop();},100);});
+</script>
+</body></html>

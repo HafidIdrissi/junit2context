@@ -1,0 +1,33 @@
+name: Runner compatibility
+description: Share a sanitized JUnit variant or propose a fixture.
+title: "[Runner] "
+body:
+  - type: input
+    id: runner
+    attributes:
+      label: Runner and version
+      description: Include any JUnit reporter or plugin version.
+    validations:
+      required: true
+  - type: textarea
+    id: generation
+    attributes:
+      label: How was the report produced?
+      description: Give the command or configuration, or state that this is a synthetic reproduction.
+    validations:
+      required: true
+  - type: textarea
+    id: fixture
+    attributes:
+      label: Sanitized XML
+      description: Remove credentials, private code, personal data, and identifying paths.
+      render: xml
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What should be preserved?
+      description: Describe which failures and details you expect in the output and any current mismatch.
+    validations:
+      required: true

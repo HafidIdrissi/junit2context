@@ -1,0 +1,40 @@
+name: Bug report
+description: Report incorrect parsing, output, or CLI behavior.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please use synthetic or sanitized reports. Never include credentials or private source code.
+        For security-sensitive issues, read SECURITY.md before posting details.
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Python version, operating system, and junit2context version or commit.
+      placeholder: Python 3.12, Ubuntu 24.04, junit2context 0.1.0
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command
+      description: The exact command, with private paths and values removed.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal XML reproduction
+      description: A small synthetic report that reproduces the issue.
+      render: xml
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: Include output or the error message where useful, after reviewing it for sensitive data.
+    validations:
+      required: true
