@@ -31,14 +31,14 @@ same interpreter; on Windows, substitute `.venv\Scripts\python.exe`.
 To run one test file, use discovery's filename pattern (`-p`):
 
 ```bash
-.venv/bin/python -m unittest discover -s tests -p 'test_core.py' -v
+.venv/bin/python -m unittest discover -s tests -p "test_core.py" -v
 ```
 
 To select the report-related CLI tests, combine that pattern with the test-name
 filter (`-k`):
 
 ```bash
-.venv/bin/python -m unittest discover -s tests -p 'test_cli.py' -k report -v
+.venv/bin/python -m unittest discover -s tests -p "test_cli.py" -k report -v
 ```
 
 `-k report` matches names containing `report`, including
@@ -50,8 +50,8 @@ For a source checkout without an editable install, expose `src` to the same
 Python 3.10+ interpreter. For example, on a POSIX shell:
 
 ```bash
-PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_core.py' -v
-PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_cli.py' -k report -v
+PYTHONPATH=src python3 -m unittest discover -s tests -p "test_core.py" -v
+PYTHONPATH=src python3 -m unittest discover -s tests -p "test_cli.py" -k report -v
 ```
 
 Focused checks help during iteration. Before a code pull request, run the full
