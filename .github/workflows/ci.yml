@@ -24,3 +24,20 @@ jobs:
       - run: python -m unittest discover -s tests -v
       - run: junit2context examples/pytest.xml examples/vitest.xml
       - run: junit2context examples/pytest.xml --format json
+
+  generated-artifacts:
+    name: Generated demo artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Regenerate demo and sample brief
+        run: python3 scripts/build_demo.py
+      - name: Check committed artifacts are current
+        run: |
+          if ! git diff --exit-code -- docs/demo.html examples/brief.md; then
+            echo "::error::Generated artifacts are stale. Run python3 scripts/build_demo.py, review docs/demo.html and examples/brief.md, and commit their updates."
+            exit 1
+          fi
