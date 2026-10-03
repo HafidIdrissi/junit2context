@@ -64,6 +64,28 @@ suite with the editable environment:
 Documentation-only edits do not require unrelated tests; verify any commands you
 add or change.
 
+## Generated demo artifacts
+
+`scripts/build_demo.py` generates the offline demo (`docs/demo.html`) and sample
+brief (`examples/brief.md`) from the bundled reports and current CLI. When changing
+the parser, renderer, reports, or demo generator, regenerate and review both text
+files before committing. From the repository root with Python 3.10 or newer:
+
+```bash
+python3 scripts/build_demo.py
+git diff --exit-code -- docs/demo.html examples/brief.md
+```
+
+On Windows, use `python` in place of `python3`. The generator uses the source
+checkout and standard library, so no package installation is needed. The diff
+command prints any changes and exits nonzero until the regenerated files match
+the index; review and include expected updates in your change.
+
+CI runs the same check in one separate Ubuntu/Python 3.12 job, rather than
+repeating generation in every test-matrix entry. It does not commit or push
+updates. The separately maintained PNG screenshot is outside this text-artifact
+check.
+
 ## Choose a contribution
 
 Check the [roadmap](docs/ROADMAP.md) for starting points. Before undertaking a large feature or adding a dependency, open an issue explaining the problem and an example of the desired output.
