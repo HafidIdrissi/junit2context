@@ -58,6 +58,14 @@ Le Markdown utilise une limite de 12 000 caractères par défaut. `--max-chars N
 
 `--max-detail-chars N` et `--max-message-chars N` modifient les limites des détails et des messages, en Markdown comme en JSON. `--max-file-bytes N` modifie la taille maximale d'un fichier d'entrée, fixée par défaut à 10 000 000 octets. `--output` remplace un éventuel fichier de sortie existant, mais refuse d'écraser un rapport d'entrée.
 
+Les limites des messages et des détails comptent les caractères conservés après
+masquage, sans l'avis de troncature. Si une limite de début ou de fin coupe
+`[REDACTED]`, le segment est raccourci pour omettre le marqueur entier, sans
+réutiliser l'espace libéré. Un marqueur qui ne tient pas est donc omis en entier.
+L'avis compte les caractères du texte masqué réellement supprimés, y compris ceux
+des marqueurs omis, et non la longueur du secret d'origine. Cette règle s'applique
+en Markdown et en JSON ; le masquage précède toujours la troncature.
+
 Le code de sortie est `0` après une conversion réussie, même si les tests ont échoué. Avec `--fail-on-failures`, il devient `1` en présence d'échecs ou d'erreurs de test. Les erreurs de lecture, d'options ou d'écriture produisent le code `2` et un message sur stderr.
 
 Un rapport annonçant des échecs ou des erreurs sans contenir d'éléments `<failure>` ou `<error>` est refusé comme incomplet.

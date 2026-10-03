@@ -115,6 +115,14 @@ junit2context report.xml [report2.xml ...] [--format markdown|json]
 
 An explicitly supplied `--max-chars` is not supported with JSON and returns an error. Values below the Markdown budget minimum also return an error.
 
+Message and detail limits count retained characters after redaction, excluding the
+omission notice. If a head or tail boundary would split `[REDACTED]`, that segment
+is shortened to omit the whole marker. The unused space is not refilled, so fewer
+than the requested characters may remain; a marker that cannot fit is omitted
+whole. The notice counts the sanitized characters actually removed, including
+any omitted marker characters, rather than the original secret's length. This
+applies to Markdown and JSON, without changing redaction-before-truncation order.
+
 ```bash
 # Structured output
 .venv/bin/junit2context examples/pytest.xml --format json --output failures.json

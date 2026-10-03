@@ -5,7 +5,62 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from junit2context.cli import main
+from junit2context.cli import _excerpt, main
+
+
+class ExcerptTests(unittest.TestCase):
+    def test_marker_boundaries_drop_only_whole_markers(self):
+        cases = [
+            ("AA[REDACTED]0123456789", "AA", "56789", 15),
+            ("0123456789[REDACTED]ZZ", "01234", "ZZ", 15),
+            ("AA[REDACTED]----[REDACTED]ZZ", "AA", "ZZ", 24),
+        ]
+        for value, head, tail, omitted in cases:
+            for label in ("message", "detail"):
+                with self.subTest(value=value, label=label):
+                    self.assertEqual(
+                        _excerpt(value, 10, label),
+                        f"{head}\n[... {omitted} {label} characters omitted ...]\n{tail}",
+                    )
+
+    def test_marker_larger_than_budget_is_omitted_whole(self):
+        for limit in range(1, 10):
+            with self.subTest(limit=limit):
+                self.assertEqual(
+                    _excerpt("[REDACTED]", limit, "detail"),
+                    "\n[... 10 detail characters omitted ...]\n",
+                )
+        self.assertEqual(_excerpt("[REDACTED]", 10, "detail"), "[REDACTED]")
+
+    def test_exact_marker_boundaries_keep_complete_markers(self):
+        self.assertEqual(
+            _excerpt("[REDACTED]0123456789abcdef", 20, "detail"),
+            "[REDACTED]\n[... 6 detail characters omitted ...]\n6789abcdef",
+        )
+        self.assertEqual(
+            _excerpt("0123456789abcdef[REDACTED]", 20, "detail"),
+            "0123456789\n[... 6 detail characters omitted ...]\n[REDACTED]",
+        )
+        self.assertEqual(
+            _excerpt("[REDACTED][REDACTED]", 19, "detail"),
+            "[REDACTED]\n[... 10 detail characters omitted ...]\n",
+        )
+
+    def test_ordinary_excerpts_and_unshortened_values_are_unchanged(self):
+        self.assertEqual(
+            _excerpt("abcdefghij", 5, "message"),
+            "abc\n[... 5 message characters omitted ...]\nij",
+        )
+        self.assertEqual(
+            _excerpt("abcdefghij", 1, "message"),
+            "a\n[... 9 message characters omitted ...]\n",
+        )
+        self.assertEqual(_excerpt("[REDACTED]", 11, "message"), "[REDACTED]")
+        self.assertEqual(_excerpt("", 1, "detail"), "")
+        self.assertEqual(
+            _excerpt("é😊abcΩ", 3, "message"),
+            "é😊\n[... 3 message characters omitted ...]\nΩ",
+        )
 
 
 class CliTests(unittest.TestCase):
@@ -63,6 +118,57 @@ class CliTests(unittest.TestCase):
         self.assertEqual(data["truncated_details"], 1)
         self.assertIn("detail characters omitted", data["failures"][0]["details"])
         self.assertNotIn("demo-private-value", out)
+
+    def test_redacted_message_and_detail_boundaries_use_actual_omission_count(self):
+        text = "AA TOKEN=head-demo-secret middle TOKEN=tail-demo-secret ZZ"
+        self.report.write_text(
+            '<testsuite><testcase name="failed"><failure message="'
+            + text + '">' + text + '</failure></testcase></testsuite>',
+            encoding="utf-8",
+        )
+        code, out, err = self.run_cli(
+            self.report, "--format", "json",
+            "--max-message-chars", "22", "--max-detail-chars", "22",
+        )
+        self.assertEqual((code, err), (0, ""))
+        data = json.loads(out)
+        self.assertEqual(data["truncated_messages"], 1)
+        self.assertEqual(data["truncated_details"], 1)
+        for field, label in (("message", "message"), ("details", "detail")):
+            self.assertEqual(
+                data["failures"][0][field],
+                f"AA TOKEN=\n[... 34 {label} characters omitted ...]\n ZZ",
+            )
+        self.assertNotIn("head-demo-secret", out)
+        self.assertNotIn("tail-demo-secret", out)
+
+        code, out, err = self.run_cli(
+            self.report, "--max-message-chars", "22", "--max-detail-chars", "22",
+        )
+        self.assertEqual((code, err), (0, ""))
+        self.assertIn("AA TOKEN=\n[... 34 detail characters omitted ...]\n ZZ", out)
+        self.assertIn(r"\[\.\.\. 34 message characters omitted \.\.\.\]", out)
+        self.assertNotIn("REDACTED", out)
+        self.assertNotIn("head-demo-secret", out)
+        self.assertNotIn("tail-demo-secret", out)
+
+    def test_markdown_keeps_retained_redaction_markers_complete(self):
+        text = "TOKEN=head-demo-secret middle TOKEN=tail-demo-secret"
+        self.report.write_text(
+            '<testsuite><testcase name="failed"><failure message="'
+            + text + '">' + text + '</failure></testcase></testsuite>',
+            encoding="utf-8",
+        )
+        code, out, err = self.run_cli(
+            self.report, "--max-message-chars", "32", "--max-detail-chars", "32",
+        )
+        self.assertEqual((code, err), (0, ""))
+        self.assertEqual(out.count("[REDACTED]"), 2)
+        self.assertEqual(out.count(r"\[REDACTED\]"), 2)
+        self.assertIn("message characters omitted", out)
+        self.assertIn("detail characters omitted", out)
+        self.assertNotIn("head-demo-secret", out)
+        self.assertNotIn("tail-demo-secret", out)
 
     def test_markdown_budget(self):
         code, out, _ = self.run_cli(self.report, "--max-chars", "128")

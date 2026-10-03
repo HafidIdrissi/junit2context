@@ -7,11 +7,12 @@ from dataclasses import asdict, replace
 import json
 import os
 from pathlib import Path
+import re
 import sys
 import tempfile
 
 from . import __version__
-from .core import ReportError, parse_reports, redact, render_markdown, sanitize_failure
+from .core import ReportError, _render_markdown, parse_reports, redact, sanitize_failure
 
 
 def _positive(value: str) -> int:
@@ -64,9 +65,15 @@ def _excerpt(value: str, limit: int, label: str) -> str:
     if len(value) <= limit:
         return value
     head = (limit + 1) // 2
-    tail = limit // 2
-    notice = f"\n[... {len(value) - limit} {label} characters omitted ...]\n"
-    return value[:head] + notice + (value[-tail:] if tail else "")
+    tail_start = len(value) - limit // 2
+    # Shorten retained segments rather than splitting a marker or exceeding the limit.
+    for marker in re.finditer(r"\[REDACTED\]", value):
+        if marker.start() < head < marker.end():
+            head = marker.start()
+        if marker.start() < tail_start < marker.end():
+            tail_start = marker.end()
+    notice = f"\n[... {tail_start - head} {label} characters omitted ...]\n"
+    return value[:head] + notice + value[tail_start:]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -101,7 +108,7 @@ def main(argv: list[str] | None = None) -> int:
                 "failures": [asdict(f) for f in limited],
             }, ensure_ascii=False, indent=2) + "\n"
         else:
-            content = render_markdown(limited, max_chars=args.max_chars or 12_000)
+            content = _render_markdown(limited, max_chars=args.max_chars or 12_000)
         if args.output is not None:
             _write_output(args.output, content)
         else:
