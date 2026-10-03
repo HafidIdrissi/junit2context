@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites name="pytest tests">
+  <testsuite name="pytest" errors="1" failures="1" skipped="0" tests="3">
+    <testcase classname="sample_tests" name="test_passing" />
+    <testcase classname="sample_tests" name="test_failed_assertion">
+      <failure message="AssertionError: synthetic assertion diagnostic&#10;assert (2 + 2) == 5">sample_tests.py:16: in test_failed_assertion
+    assert 2 + 2 == 5, "synthetic assertion diagnostic"
+E   AssertionError: synthetic assertion diagnostic
+E   assert (2 + 2) == 5</failure>
+    </testcase>
+    <testcase classname="sample_tests" name="test_setup_error">
+      <error message="failed on setup with &quot;RuntimeError: synthetic setup unavailable&quot;">sample_tests.py:8: in unavailable_service
+    raise RuntimeError("synthetic setup unavailable")
+E   RuntimeError: synthetic setup unavailable</error>
+    </testcase>
+  </testsuite>
+</testsuites>
