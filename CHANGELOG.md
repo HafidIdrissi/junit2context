@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Keep `[REDACTED]` markers whole when excerpting messages and details, and report
+  the actual number of sanitized characters omitted at adjusted boundaries.
+
 ## 0.1.0
 
 Initial implementation:

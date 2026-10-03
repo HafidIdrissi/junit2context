@@ -209,7 +209,6 @@ def _inline(text: str) -> str:
 
 
 def _failure_block(failure: Failure, index: int) -> str:
-    failure = sanitize_failure(failure)
     lines = [
         f"### {index}. {_inline(failure.name)}",
         "",
@@ -236,6 +235,13 @@ def render_markdown(failures: list[Failure], max_chars: int = 12_000) -> str:
     The minimum budget is 128 characters. This is not a tokenizer estimate.
     """
 
+    return _render_markdown(failures, max_chars, sanitize=True)
+
+
+def _render_markdown(failures: list[Failure], max_chars: int = 12_000,
+                     *, sanitize: bool = False) -> str:
+    """Render already sanitized CLI excerpts, or sanitize public API inputs."""
+
     if max_chars < 128:
         raise ValueError("max_chars must be at least 128")
     if not failures:
@@ -251,6 +257,8 @@ def render_markdown(failures: list[Failure], max_chars: int = 12_000) -> str:
 
     blocks: list[str] = []
     for index, failure in enumerate(failures, start=1):
+        if sanitize:
+            failure = sanitize_failure(failure)
         block = _failure_block(failure, index)
         candidate = assemble([*blocks, block], count - index)
         if len(candidate) > max_chars:
