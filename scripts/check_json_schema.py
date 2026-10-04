@@ -31,6 +31,7 @@ def main() -> int:
 
     env = os.environ.copy()
     env["PYTHONPATH"] = str(root / "src")
+    env["PYTHONIOENCODING"] = "utf-8"
     with tempfile.TemporaryDirectory() as directory:
         report = Path(directory) / "example.xml"
         for xml in (
