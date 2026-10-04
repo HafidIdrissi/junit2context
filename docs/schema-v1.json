@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "junit2context JSON output, schema version 1",
+  "description": "The existing CLI envelope. Unknown properties are accepted at both levels; all current properties are required.",
+  "type": "object",
+  "required": ["schema_version", "failure_count", "truncated_details", "truncated_messages", "failures"],
+  "additionalProperties": true,
+  "properties": {
+    "schema_version": {"type": "integer", "const": 1},
+    "failure_count": {"type": "integer", "minimum": 0, "description": "Number of unique failure records in failures."},
+    "truncated_details": {"type": "integer", "minimum": 0, "description": "Number of records whose sanitized details were shortened."},
+    "truncated_messages": {"type": "integer", "minimum": 0, "description": "Number of records whose sanitized message was shortened."},
+    "failures": {"type": "array", "items": {"$ref": "#/$defs/failure"}}
+  },
+  "$defs": {
+    "failure": {
+      "type": "object",
+      "required": ["source", "suite", "classname", "name", "kind", "message", "details"],
+      "additionalProperties": true,
+      "properties": {
+        "source": {"type": "string", "description": "Sanitized path of the first report containing this unique record; not necessarily a URI or an existing path for the reader."},
+        "suite": {"type": "string"},
+        "classname": {"type": "string", "description": "May be empty when the report provides no class name."},
+        "name": {"type": "string"},
+        "kind": {"type": "string", "enum": ["failure", "error"]},
+        "message": {"type": "string", "description": "Sanitized message, possibly empty or containing an excerpt notice."},
+        "details": {"type": "string", "description": "Sanitized details, possibly empty or containing an excerpt notice."}
+      }
+    }
+  }
+}

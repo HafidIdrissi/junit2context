@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "failure_count": 2,
+  "truncated_details": 1,
+  "truncated_messages": 0,
+  "failures": [
+    {
+      "source": "reports/example.xml",
+      "suite": "démo",
+      "classname": "tests.Example",
+      "name": "test_café_😊",
+      "kind": "failure",
+      "message": "expected café, got thé",
+      "details": "TOKEN=[REDACTED]\n[... 30 detail characters omitted ...]\nAssertionError: Ω"
+    },
+    {
+      "source": "reports/example.xml",
+      "suite": "démo",
+      "classname": "",
+      "name": "test_missing_resource",
+      "kind": "error",
+      "message": "",
+      "details": ""
+    }
+  ]
+}

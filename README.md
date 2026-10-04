@@ -133,6 +133,9 @@ applies to Markdown and JSON, without changing redaction-before-truncation order
 
 JSON output has `schema_version`, `failure_count`, `truncated_details`, `truncated_messages`, and `failures` fields. Each failure contains `source`, `suite`, `classname`, `name`, `kind`, `message`, and `details`. The truncation counts indicate how many records had text shortened; the corresponding fields include omission notices.
 
+The checked-in [version 1 JSON Schema](docs/schema-v1.json) describes this output.
+See [schema compatibility, examples, and optional contributor validation](docs/JSON_SCHEMA.md).
+
 Exit status is `0` on successful conversion, including reports with failing tests; `1` means reported failures when `--fail-on-failures` is enabled; `2` means an input, option, or output error. Errors are written to stderr.
 
 A report that claims failures or errors but contains no `<failure>` or `<error>` records is rejected as incomplete.
