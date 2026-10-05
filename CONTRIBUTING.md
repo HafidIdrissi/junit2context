@@ -86,6 +86,50 @@ repeating generation in every test-matrix entry. It does not commit or push
 updates. The separately maintained PNG screenshot is outside this text-artifact
 check.
 
+## Local documentation links
+
+Check repository-local file targets offline, with Python 3.10 or newer:
+
+```bash
+python3 scripts/check_local_links.py
+```
+
+On Windows, use `python` in place of `python3`. CI runs this command once in the
+documentation job. It uses only the standard library and never opens URLs.
+The check covers root-level Markdown files, Markdown files recursively under
+`docs/`, and `docs/demo.html`. Generated report content in `examples/` and runner
+fixture documentation in `tests/` are outside this maintained-document check.
+
+The supported Markdown subset is single-line inline links and images with a
+bare destination (no whitespace, parentheses, or backslash escapes), or an
+angle-bracket destination for filenames with spaces. For example:
+
+```markdown
+[guide](docs/ROADMAP.md)
+![preview](docs/demo-preview.png)
+[space in filename](<notes with spaces.md>)
+[escaped filename](notes%20with%20spaces.md#section)
+```
+
+Paths resolve relative to the containing document. Percent escapes are decoded
+after separating the query and fragment; queries and fragments are ignored, so
+**anchor validation is deferred**. Fragment-only links and all URL schemes or
+protocol-relative URLs are skipped, including `https:`, `mailto:` and `file:`.
+Local destinations must name files inside the repository; absolute local paths
+are unsupported. Errors identify the referring file, line, and destination.
+
+Fenced and indented code lines and same-line backtick code spans are skipped.
+This is a deliberately limited check, not a Markdown renderer: reference-style
+links, autolinks, raw HTML in Markdown, and multiline links are outside the
+supported subset. It scans `](...)` destinations without fully parsing link
+labels; put literal syntax examples in code spans or fences. Use the inline form
+above for maintained local links. Inline
+destinations with titles or backslash escapes produce an **unsupported syntax**
+diagnostic rather than a missing-file diagnostic; encode special filename
+characters with percent escapes. For the HTML demo, `href` and `src` attributes
+are checked using the standard-library HTML parser, including HTML entities;
+links in JavaScript strings are not checked.
+
 ## Choose a contribution
 
 Check the [roadmap](docs/ROADMAP.md) for starting points. Before undertaking a large feature or adding a dependency, open an issue explaining the problem and an example of the desired output.
