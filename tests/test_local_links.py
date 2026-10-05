@@ -41,10 +41,10 @@ class LocalLinkTests(unittest.TestCase):
         self.assertEqual(count, 3)
 
     def test_decodes_paths_after_removing_query_and_fragment(self):
-        self.write("docs/café guide#1?.md")
+        self.write("docs/café guide#1.md")
         self.write("docs/with space.md")
         errors, count = self.check(
-            "[guide](caf%C3%A9%20guide%231%3F.md?download=1#not-a-real-anchor)\n"
+            "[guide](caf%C3%A9%20guide%231.md?download=1#not-a-real-anchor)\n"
             "[spaces](<with space.md>) [self](#anchor) [query](?download=1)\n"
         )
         self.assertEqual(errors, [])

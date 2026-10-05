@@ -81,6 +81,10 @@ def check_document(document: Path, root: Path) -> tuple[list[str], int]:
             continue
         if not path:
             continue  # Fragment/query-only links do not name another file.
+        if "\x00" in path:
+            problems.append(f"{label}:{line}: invalid or unreadable local target "
+                            f"{raw!r}: NUL is not allowed in filenames")
+            continue
         if path.startswith("/"):
             problems.append(f"{label}:{line}: unsupported absolute local path: {raw!r}")
             continue
