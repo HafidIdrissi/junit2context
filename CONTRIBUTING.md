@@ -132,6 +132,10 @@ links in JavaScript strings are not checked.
 
 ## Choose a contribution
 
+For local release preparation and download verification, see the
+[SHA-256 manifest guide](docs/RELEASE_CHECKSUMS.md). The standard-library helper
+hashes only explicitly selected artifacts; it does not create or upload releases.
+
 Check the [roadmap](docs/ROADMAP.md) for starting points. Before undertaking a large feature or adding a dependency, open an issue explaining the problem and an example of the desired output.
 
 For a bug report, include the command, Python version, expected behavior, actual behavior, and a small synthetic XML example. Do not upload private CI reports or credentials. For security issues, follow [SECURITY.md](SECURITY.md).
