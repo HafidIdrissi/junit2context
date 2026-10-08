@@ -64,6 +64,35 @@ suite with the editable environment:
 Documentation-only edits do not require unrelated tests; verify any commands you
 add or change.
 
+## Installed wheel smoke test
+
+From the repository root, use the development environment above to install the
+build frontend and check the actual wheel:
+
+```bash
+.venv/bin/python -m pip install build
+.venv/bin/python scripts/smoke_wheel.py
+```
+
+On Windows, substitute `.venv\Scripts\python.exe`. `build` and the backend in
+`pyproject.toml` are build-only tooling; the runtime dependency list stays empty.
+Building may download backend requirements. The subsequent wheel installation
+uses `--no-deps --no-index` and the exact artifact path, without an editable install.
+
+The script builds only a wheel into an empty temporary output directory, requires
+exactly one wheel, and installs it into a fresh virtual environment. From an
+unrelated temporary working directory, with `PYTHONPATH` and `PYTHONHOME` removed,
+it checks installed package/CLI origins and distribution version, both entry
+points' `--version`, and synthetic Markdown/JSON conversions through both entry
+points. The report includes a failure, an error, a passing case, and a synthetic
+token to verify useful output and redaction. Temporary environments and reports
+are removed on exit. A failed check exits 1 and reports the command, working
+directory, and captured output for subprocess failures.
+
+CI runs this once in the **Installed wheel smoke** job. The standard-library test
+suite also installs minimal synthetic wheels to ensure missing console or module
+entry points fail the check; these fixtures do not replace the real build check.
+
 ## Generated demo artifacts
 
 `scripts/build_demo.py` generates the offline demo (`docs/demo.html`) and sample
