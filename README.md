@@ -45,6 +45,8 @@ pipx install git+https://github.com/HafidIdrissi/junit2context.git
 ```
 
 Installation currently uses this Git repository; there is no PyPI release yet.
+For release download files with a checksum manifest, see
+[SHA-256 verification](docs/RELEASE_CHECKSUMS.md).
 
 The two bundled reports produce three unique failures. Here is an excerpt of the generated brief:
 
