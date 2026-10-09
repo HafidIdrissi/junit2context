@@ -64,6 +64,15 @@ suite with the editable environment:
 Documentation-only edits do not require unrelated tests; verify any commands you
 add or change.
 
+## CI interpreter coverage
+
+The test job runs Python 3.10, 3.12, and 3.14 on Ubuntu, Windows, and macOS.
+Python 3.11 and 3.13 are included on Ubuntu only: these two extra jobs exercise
+the intervening supported interpreters without expanding the full OS matrix.
+All 11 entries run the same package installation, unit tests, and Markdown/JSON
+CLI smoke commands. The minimum supported version remains Python 3.10, as
+declared by `requires-python` in `pyproject.toml`.
+
 ## Installed wheel smoke test
 
 From the repository root, use the development environment above to install the
