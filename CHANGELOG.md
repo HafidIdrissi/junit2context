@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Include the test fixtures and helper scripts required by the shipped source
+  tests, and verify the source archive, its tests, and a rebuilt installed wheel.
+
 - Keep `[REDACTED]` markers whole when excerpting messages and details, and report
   the actual number of sanitized characters omitted at adjusted boundaries.
 
