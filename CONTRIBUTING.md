@@ -102,6 +102,36 @@ CI runs this once in the **Installed wheel smoke** job. The standard-library tes
 suite also installs minimal synthetic wheels to ensure missing console or module
 entry points fail the check; these fixtures do not replace the real build check.
 
+## Distribution metadata
+
+Before preparing a public package release, build both distributions and validate
+their metadata from the repository root (use a fresh output directory):
+
+```bash
+.venv/bin/python -m pip install build twine
+.venv/bin/python -m build --outdir dist-metadata
+.venv/bin/python -m twine check --strict dist-metadata/*
+```
+
+On Windows, use `.venv\Scripts\python.exe`. These are build/check tools, not
+runtime dependencies. The commands build and check local files; they do not
+upload a package or imply that a PyPI release exists.
+
+Inspect `junit2context-0.1.0.dist-info/METADATA` inside the wheel and `PKG-INFO`
+inside the source archive (substitute the current version). Both should report
+the project name and version from `pyproject.toml`, its description, Python
+`>=3.10`, MIT license, and `text/markdown` README content. Check the Source,
+Documentation, Changelog, Homepage, and Issues URLs against the public repository.
+The Alpha classifier describes release maturity; Python 3.10–3.14 classifiers
+reflect the current CI interpreter coverage above, not a promise about untested
+future versions. The Python requirement remains open-ended at `>=3.10`.
+
+Keep the existing license table and MIT classifier while supporting
+`setuptools>=68`. Migrating to a newer license metadata format is a separate
+build-backend compatibility decision. A successful `twine check` validates
+metadata/rendering, not tests, installation, license compliance, or URL reachability;
+run the applicable checks separately.
+
 ## Generated demo artifacts
 
 `scripts/build_demo.py` generates the offline demo (`docs/demo.html`) and sample
