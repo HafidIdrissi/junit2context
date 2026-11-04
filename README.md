@@ -137,6 +137,7 @@ JSON output has `schema_version`, `failure_count`, `truncated_details`, `truncat
 
 The checked-in [version 1 JSON Schema](docs/schema-v1.json) describes this output.
 See [schema compatibility, examples, and optional contributor validation](docs/JSON_SCHEMA.md).
+For a complete standard-library consumer, follow the [Python JSON inventory recipe](docs/CONSUME_JSON.md).
 
 Exit status is `0` on successful conversion, including reports with failing tests; `1` means reported failures when `--fail-on-failures` is enabled; `2` means an input, option, or output error. Errors are written to stderr.
 
