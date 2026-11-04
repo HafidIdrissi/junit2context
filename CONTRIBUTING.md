@@ -176,7 +176,7 @@ hashes only explicitly selected artifacts; it does not create or upload releases
 
 Check the [roadmap](docs/ROADMAP.md) for starting points. Before undertaking a large feature or adding a dependency, open an issue explaining the problem and an example of the desired output.
 
-For a bug report, include the command, Python version, expected behavior, actual behavior, and a small synthetic XML example. Do not upload private CI reports or credentials. For security issues, follow [SECURITY.md](SECURITY.md).
+For a bug report, include the command, Python version, expected behavior, actual behavior, and a small synthetic XML example. Follow the [XML reduction walkthrough](docs/MINIMAL_XML.md) to minimize and sanitize an example while preserving its behavior. Do not upload private CI reports or credentials. For security issues, follow [SECURITY.md](SECURITY.md).
 
 ## Add a runner fixture
 
